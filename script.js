@@ -13,7 +13,7 @@ meuFormulario.addEventListener("submit", function(event) {
   result.textContent = texto;
   textoCopiado2 = texto;
 
-
+  meuFormulario.style.height = "350px";
   matricula.value = ""
   codigo.value = ""
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
