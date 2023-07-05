@@ -19,17 +19,7 @@ meuFormulario.addEventListener("submit", function(event) {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     let tab = tabs[0];
     
-    chrome.tabs.executeScript(tab.id, { code: `
-      var xpath = '//*[@id="ContentPlaceHolder1_txbMatricula"]';
-      var element = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-      
-      if (element) {
-        var valor = element.textContent;
-        // Faça algo com o valor extraído aqui
-        console.log(valor);
-        alert(valor)
-      }
-    `});
+    
   });
 });
 
