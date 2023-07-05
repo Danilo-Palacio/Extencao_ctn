@@ -1,27 +1,49 @@
 let meuFormulario = document.getElementById("meuFormulario")
 let matricula = document.getElementById("matricula");
 let codigo = document.getElementById("codigo");
-let result = document.getElementById("result");
+let resultado = document.getElementById("result");
 
 
-let textoCopiado2 = ""
+let textoCopiado2 = "";
 
-meuFormulario.addEventListener("submit", function(event) {
- 
+const getCodigo = () =>{
+
+  let xpathMatricula = '//*[@id="ContentPlaceHolder1_txbMatricula"]';
+  let resultMatricula = document.evaluate(xpathMatricula, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+  let elementMatricula = resultMatricula.singleNodeValue;
+
+  
+  let xpathCodigo = '//*[@id="ContentPlaceHolder1_gvContFiliados_lbCodigo_0"]';
+  let resultCodigo = document.evaluate(xpathCodigo, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+  let elementCodigo = resultCodigo.singleNodeValue ;
+  
+
+  let codigo =`
+  ${elementMatricula.value}_${elementCodigo.innerText}_`;
+  return codigo
+}
+
+meuFormulario.addEventListener('submit', async(event) => {
   event.preventDefault();  
-  let texto = `${matricula.value}_${codigo.value}_`;
-  result.textContent = texto;
-  textoCopiado2 = texto;
 
-  meuFormulario.style.height = "350px";
-  matricula.value = ""
-  codigo.value = ""
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    let tab = tabs[0];
-    
-    
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow:true });
+
+  chrome.scripting.executeScript({
+    target:{ tabId: tab.id},
+    function: getCodigo,
+  }, (result) => {
+      if (!chrome.runtime.lastError && result && result[0] && result[0].result) {
+        var codigo = result[0].result;
+        // Faça algo com o valor retornado (codigo)
+        resultado.textContent = codigo;
+        meuFormulario.style.height = "180px";
+        console.log(codigo);
+        navigator.clipboard.writeText(codigo)
+      }
   });
 });
+
+
 
 // Seletor do campo de entrada de texto na sua extensão
 let inputField = matricula;
@@ -44,16 +66,6 @@ if (informacaoArmazenada) {
 
 
 
-
-
-
-
-
-
-
-
-
-
 //Funções para abrir e fechar o modal
 
 
@@ -67,7 +79,7 @@ document.getElementById("title").addEventListener( 'click', function(){
       'flex-wrap: wrap;' +
       'justify-content: space-between;' +
       'align-items: center;'
-    meuFormulario.style.height = "270px";
+    meuFormulario.style.height = "150px";
   }else{
     classDisplay.style.display = 'none';
     meuFormulario.style.height = "100%";

@@ -2,7 +2,7 @@
     "name": "Atalhos CTN",
     "description": "Extensão criada para gerar codigos de arquivos e baixar relatórios de filiados",
     
-    "version":"0.0.1",
+    "version":"0.0.3",
     "manifest_version":3,
     "permissions": [
         "activeTab",

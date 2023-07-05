@@ -19,6 +19,7 @@ body{
     align-items: center;
 }
 #meuFormulario, #relatorio{
+    width: 20rem;
     height: 100%;
     padding: 0% 10% 0 10%;
     margin-bottom: 10px;
@@ -36,6 +37,9 @@ input{
     color: gray;
     margin: 15px 0 0 0;
     
+}
+#matricula, #codigo{
+    display: none;
 }
 .title{
     color: #428d70;
