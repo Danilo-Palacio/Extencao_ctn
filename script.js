@@ -3,9 +3,6 @@ let matricula = document.getElementById("matricula");
 let codigo = document.getElementById("codigo");
 let resultado = document.getElementById("result");
 
-var dateControl = document.querySelector('input[type="date"]');
-dateControl.value = '2017-06-01';
-
 let textoCopiado2 = "";
 
 const getCodigo = () =>{
@@ -20,8 +17,7 @@ const getCodigo = () =>{
   let elementCodigo = resultCodigo.singleNodeValue ;
   
 
-  let codigo =`
-  ${elementMatricula.value}_${elementCodigo.innerText}_`;
+  let codigo =`${elementMatricula.value}_${elementCodigo.innerText}_`;
   return codigo
 }
 
@@ -49,8 +45,6 @@ meuFormulario.addEventListener('submit', async(event) => {
 
 
 //Funções para abrir e fechar o modal
-
-
 document.getElementById("title").addEventListener( 'click', function(){ 
   let classDisplay = document.getElementById("display");
   
@@ -78,7 +72,7 @@ if (classDisplay.style.display === 'none'|| classDisplay.style.display === ''){
     'flex-wrap: wrap;' +
     'justify-content: space-between;' +
     'align-items: center;'
-  idRelatorio.style.height = "270px";
+  idRelatorio.style.height = "395px";
 }else{
   classDisplay.style.display = 'none';
   idRelatorio.style.height = "100%";
@@ -89,7 +83,7 @@ if (classDisplay.style.display === 'none'|| classDisplay.style.display === ''){
 
 
 
-// Baixar Relatório
+//Baixar Relatório Filiado
 document.getElementById("baixarFiliacao").addEventListener('click', function() {
   let start= document.getElementById("start");
   let end = document.getElementById("end");
@@ -100,10 +94,12 @@ document.getElementById("baixarFiliacao").addEventListener('click', function() {
   chrome.tabs.create({ url: linkFiliacao});
 });
 
+//Baixar Relatório Migração
 document.getElementById("baixarMigracao").addEventListener('click', function() {
   let referenciaMigracao = document.getElementById("referencia");
-
-  let linkMigracao = `https://ctn.sistematodos.com.br/paginas/filiado/relatorio/RelatorioFiliadosMigrados.aspx?referencia=${referenciaMigracao.value}`
+  let referenciaMigracaoFormatado = alterarFormatoMigracao(referenciaMigracao.value)
+  
+  let linkMigracao = `https://ctn.sistematodos.com.br/paginas/filiado/relatorio/RelatorioFiliadosMigrados.aspx?referencia=${referenciaMigracaoFormatado}`
   chrome.tabs.create({ url: linkMigracao });
   
 });
@@ -118,11 +114,27 @@ document.getElementById("baixarMigracao").addEventListener('click', function() {
       if (mes < 10) {
         mes = "0" + mes;
       }
+      if (dia < 10){
+        dia = "0" + dia;
+      }
         var dataFormatada = dia + "/" + mes + "/" + ano;
       return dataFormatada
     }
   }
+  
 
-
+  function alterarFormatoMigracao(data){
+    var valor = data;
+    if (valor){
+      var data = new Date(valor);
+      var mes = data.getMonth() + 2;
+      var ano = data.getFullYear();
+      if (mes < 10) {
+        mes = "0" + mes ;
+      }
+      let dataFormatada = ano +"/"+ mes;
+      return dataFormatada
+    }
+  }
 
 
