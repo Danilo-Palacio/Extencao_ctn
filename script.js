@@ -2,6 +2,51 @@ let meuFormulario = document.getElementById("meuFormulario")
 let matricula = document.getElementById("matricula");
 let codigo = document.getElementById("codigo");
 let resultado = document.getElementById("result");
+let icon = document.getElementById("icon")
+
+// chrome.action.setIcon({imageData: imageData}, () => { /* ... */ });
+
+icon.addEventListener('submit', async(event) => {
+  event.preventDefault();  
+  
+  const canvas = new OffscreenCanvas(16, 16);
+  const context = canvas.getContext('2d');
+  
+  // Crie uma nova instância de Image
+  const image = new Image();
+
+  image.onload = () => {
+    // Quando a imagem for carregada, desenhe-a no canvas
+    context.drawImage(image, 0, 0);
+    
+    // Obtenha os dados da imagem desenhada no canvas
+    const imageData = context.getImageData(0, 0, 16, 16);
+    
+    // Use chrome.action.setIcon() para definir o ícone com a imagem
+    chrome.action.setIcon({imageData}, () => {/*...*/});
+  }; 
+  
+  image.src = '16_red.png';
+});
+
+chrome.tabs.onActivated.addListener(activeInfo => {
+  chrome.tabs.get(activeInfo.tabId, tab => {
+    if (tab.url.includes('https://ctn.sistematodos.com.br/paginas/filiado/ListaFiliado.aspx')) {
+
+      console.log("ativo content")
+      // Injeta um script na guia ativa para detectar cliques nos botões
+      chrome.tabs.executeScript(tab.id, { file: 'contentScript.js' });
+      const element = document.querySelector('#ContentPlaceHolder1_btnPesquisar')
+   
+      element.addEventListener('submit', async(event) => {
+      event.preventDefault();  
+      alert('Botão clicado!')});
+    }
+  })
+});
+  
+
+
 
 let textoCopiado2 = "";
 
