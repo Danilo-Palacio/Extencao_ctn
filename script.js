@@ -5,17 +5,39 @@ let resultado = document.getElementById("result");
 let icon = document.getElementById("icon")
 
 
+
+
 const getInputs = () => {
+  let filiado = {
+    matricula : '//*[@id="ContentPlaceHolder1_txbMatricula"]', 
+    dataFiliacao : '//*[@id="ContentPlaceHolder1_txbDtInclusao"]',
+    nomeCompleto : '//*[@id="ContentPlaceHolder1_txbNomeFiliado"]',
+    dataNascimento: '//*[@id="ContentPlaceHolder1_txbDtNascFiliado_txbData"]',
+    sexo : '//*[@id="ContentPlaceHolder1_ddlSexoFiliado"]',
+    estadoCivil : '//*[@id="ContentPlaceHolder1_ddlEstadoCivilFiliado"]',
+    identidade : '//*[@id="ContentPlaceHolder1_txbIdentFiliado"]',
+    timeCoração : '//*[@id="ContentPlaceHolder1_ddlTimeCoracaoFiliado"]',
+    email: '//*[@id="ContentPlaceHolder1_txbEmailFiliado"]',
+    telefone: '//*[@id="ContentPlaceHolder1_txbTelFiliado"]',
+    arquivos: 
+    {
+      tipoDocumento : `//*[@id="corpoPesquisa"]/tr[0]/td[2]`,
+      arquivoOriginal : '//*[@id="dsArquivoOriginal"]',
+      dataCriacao : '//*[@id="corpoPesquisa"]/tr[1]/td[3]',
+    }
+    // se a coluna 2 tiver a data igual ou superior a data de filiação, é true
+  }
 
-    //alert('ooi')
+    let xpathIndice = (indice) => {
+      let xpathInput = indice;
+      let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+      let elementInput = resultInput.singleNodeValue;
 
-    let xpathInput = '//*[@id="corpoPesquisa"]/tr[1]';
-    let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-    let elementInput = resultInput.singleNodeValue;
+      return elementInput.value
+    }
 
-    let codigo = `${elementInput}`;
+    let codigo = xpathIndice(filiado.telefone);
     return codigo
-
 }
 
 icon.addEventListener('submit', async(event) => {
@@ -32,8 +54,6 @@ icon.addEventListener('submit', async(event) => {
     chrome.action.setIcon({imageData}, () => {/*...*/});
   }; 
 
-
-
   chrome.scripting.executeScript({
     target:{ tabId: tab.id},
     function: getInputs,
@@ -43,12 +63,12 @@ icon.addEventListener('submit', async(event) => {
             alert(codigo);
         
         });
-  
  
-  
-  
   image.src = '16_red.png';
 });
+
+
+
 chrome.tabs.onActivated.addListener(activeInfo => {
   chrome.tabs.get(activeInfo.tabId, tab => {
     if (tab.url.includes('https://ctn.sistematodos.com.br/paginas/filiado/ListaFiliado.aspx')) {
