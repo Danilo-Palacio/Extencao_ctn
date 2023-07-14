@@ -1,34 +1,54 @@
-let meuFormulario = document.getElementById("meuFormulario")
+let generateCode = document.getElementById("generateCode")
 let matricula = document.getElementById("matricula");
 let codigo = document.getElementById("codigo");
 let resultado = document.getElementById("result");
 let icon = document.getElementById("icon")
 
-// chrome.action.setIcon({imageData: imageData}, () => { /* ... */ });
+
+const getInputs = () => {
+
+    //alert('ooi')
+
+    let xpathInput = '//*[@id="corpoPesquisa"]/tr[1]';
+    let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    let elementInput = resultInput.singleNodeValue;
+
+    let codigo = `${elementInput}`;
+    return codigo
+
+}
 
 icon.addEventListener('submit', async(event) => {
   event.preventDefault();  
-  
+
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow:true });
   const canvas = new OffscreenCanvas(16, 16);
   const context = canvas.getContext('2d');
-  
-  // Crie uma nova instância de Image
   const image = new Image();
 
   image.onload = () => {
-    // Quando a imagem for carregada, desenhe-a no canvas
     context.drawImage(image, 0, 0);
-    
-    // Obtenha os dados da imagem desenhada no canvas
     const imageData = context.getImageData(0, 0, 16, 16);
-    
-    // Use chrome.action.setIcon() para definir o ícone com a imagem
     chrome.action.setIcon({imageData}, () => {/*...*/});
   }; 
+
+
+
+  chrome.scripting.executeScript({
+    target:{ tabId: tab.id},
+    function: getInputs,
+        }, (result) => {
+            var codigo = result[0].result;
+            console.log(codigo)
+            alert(codigo);
+        
+        });
+  
+ 
+  
   
   image.src = '16_red.png';
 });
-
 chrome.tabs.onActivated.addListener(activeInfo => {
   chrome.tabs.get(activeInfo.tabId, tab => {
     if (tab.url.includes('https://ctn.sistematodos.com.br/paginas/filiado/ListaFiliado.aspx')) {
@@ -45,9 +65,6 @@ chrome.tabs.onActivated.addListener(activeInfo => {
   })
 });
   
-
-
-
 let textoCopiado2 = "";
 
 const getCodigo = () =>{
@@ -66,7 +83,7 @@ const getCodigo = () =>{
   return codigo
 }
 
-meuFormulario.addEventListener('submit', async(event) => {
+generateCode.addEventListener('submit', async(event) => {
   event.preventDefault();  
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow:true });
@@ -74,15 +91,15 @@ meuFormulario.addEventListener('submit', async(event) => {
   chrome.scripting.executeScript({
     target:{ tabId: tab.id},
     function: getCodigo,
-  }, (result) => {
-      if (!chrome.runtime.lastError && result && result[0] && result[0].result) {
-        var codigo = result[0].result;
-        // Faça algo com o valor retornado (codigo)
-        resultado.textContent = codigo;
-        meuFormulario.style.height = "180px";
-        console.log(codigo);
-        navigator.clipboard.writeText(codigo)
-      }
+        }, (result) => {
+            if (!chrome.runtime.lastError && result && result[0] && result[0].result) {
+                var codigo = result[0].result;
+                
+                resultado.textContent = codigo;
+                generateCode.style.height = "180px";
+                console.log(codigo);
+                navigator.clipboard.writeText(codigo)
+            }
   });
 });
 
@@ -100,15 +117,15 @@ document.getElementById("title").addEventListener( 'click', function(){
       'flex-wrap: wrap;' +
       'justify-content: space-between;' +
       'align-items: center;'
-    meuFormulario.style.height = "150px";
+      generateCode.style.height = "150px";
   }else{
     classDisplay.style.display = 'none';
-    meuFormulario.style.height = "100%";
+    generateCode.style.height = "100%";
   }
 });
 document.getElementById("title1").addEventListener( 'click', function(){ 
   let classDisplay = document.getElementById("display1"); 
-  let idRelatorio = document.getElementById("relatorio")
+  let idReport = document.getElementById("report")
 
 if (classDisplay.style.display === 'none'|| classDisplay.style.display === ''){
   classDisplay.style.cssText  = 
@@ -117,10 +134,10 @@ if (classDisplay.style.display === 'none'|| classDisplay.style.display === ''){
     'flex-wrap: wrap;' +
     'justify-content: space-between;' +
     'align-items: center;'
-  idRelatorio.style.height = "395px";
+    idReport.style.height = "395px";
 }else{
   classDisplay.style.display = 'none';
-  idRelatorio.style.height = "100%";
+  idReport.style.height = "100%";
 }
 });
 
