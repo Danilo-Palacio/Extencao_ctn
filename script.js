@@ -4,45 +4,42 @@ let codigo = document.getElementById("codigo");
 let resultado = document.getElementById("result");
 let icon = document.getElementById("icon")
 
-
-
-
-const getInputs = () => {
-  let filiado = {
-    matricula : '//*[@id="ContentPlaceHolder1_txbMatricula"]', 
-    dataFiliacao : '//*[@id="ContentPlaceHolder1_txbDtInclusao"]',
-    nomeCompleto : '//*[@id="ContentPlaceHolder1_txbNomeFiliado"]',
-    dataNascimento: '//*[@id="ContentPlaceHolder1_txbDtNascFiliado_txbData"]',
-    sexo : '//*[@id="ContentPlaceHolder1_ddlSexoFiliado"]',
-    estadoCivil : '//*[@id="ContentPlaceHolder1_ddlEstadoCivilFiliado"]',
-    identidade : '//*[@id="ContentPlaceHolder1_txbIdentFiliado"]',
-    timeCoração : '//*[@id="ContentPlaceHolder1_ddlTimeCoracaoFiliado"]',
-    email: '//*[@id="ContentPlaceHolder1_txbEmailFiliado"]',
-    telefone: '//*[@id="ContentPlaceHolder1_txbTelFiliado"]',
-    arquivos: 
+let filiado = {
+  matricula : '//*[@id="ContentPlaceHolder1_txbMatricula"]', 
+  dataFiliacao : '//*[@id="ContentPlaceHolder1_txbDtInclusao"]',
+  nomeCompleto : '//*[@id="ContentPlaceHolder1_txbNomeFiliado"]',
+  dataNascimento: '//*[@id="ContentPlaceHolder1_txbDtNascFiliado_txbData"]',
+  sexo : '//*[@id="ContentPlaceHolder1_ddlSexoFiliado"]',
+  estadoCivil : '//*[@id="ContentPlaceHolder1_ddlEstadoCivilFiliado"]',
+  identidade : '//*[@id="ContentPlaceHolder1_txbIdentFiliado"]',
+  timeCoração : '//*[@id="ContentPlaceHolder1_ddlTimeCoracaoFiliado"]',
+  email: '//*[@id="ContentPlaceHolder1_txbEmailFiliado"]',
+  telefone: '//*[@id="ContentPlaceHolder1_txbTelFiliado"]',
+  arquivos: 
     {
       tipoDocumento : `//*[@id="corpoPesquisa"]/tr[0]/td[2]`,
       arquivoOriginal : '//*[@id="dsArquivoOriginal"]',
       dataCriacao : '//*[@id="corpoPesquisa"]/tr[1]/td[3]',
     }
-    // se a coluna 2 tiver a data igual ou superior a data de filiação, é true
-  }
-
-    let xpathIndice = (indice) => {
-      let xpathInput = indice;
-      let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-      let elementInput = resultInput.singleNodeValue;
-
-      return elementInput.value
-    }
-
-    let codigo = xpathIndice(filiado.telefone);
+  // se a coluna 2 tiver a data igual ou superior a data de filiação, é true
+};
+const getInputs = (locations) => {
+    let xpathInput = locations;
+    let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    let elementInput = resultInput.singleNodeValue;
+    let codigo = elementInput.value;
     return codigo
 }
 
+for (let prop in filiado) {
+  if (obj.hasOwnProperty(prop)) {
+    console.log(`Propriedade: ${prop}, Valor: ${obj[prop]}`);
+  }
+}
+let justice = filiado.matricula;
+
 icon.addEventListener('submit', async(event) => {
   event.preventDefault();  
-
   const [tab] = await chrome.tabs.query({ active: true, currentWindow:true });
   const canvas = new OffscreenCanvas(16, 16);
   const context = canvas.getContext('2d');
@@ -53,17 +50,14 @@ icon.addEventListener('submit', async(event) => {
     const imageData = context.getImageData(0, 0, 16, 16);
     chrome.action.setIcon({imageData}, () => {/*...*/});
   }; 
-
   chrome.scripting.executeScript({
     target:{ tabId: tab.id},
     function: getInputs,
+    args: [justice],
         }, (result) => {
-            var codigo = result[0].result;
-            console.log(codigo)
-            alert(codigo);
-        
+            let codigo = result[0].result;
+            console.log(codigo);            
         });
- 
   image.src = '16_red.png';
 });
 
