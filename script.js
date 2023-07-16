@@ -28,8 +28,11 @@ let filiado = {
 };
 const getInputs = (locations) => {
     let xpathInput = locations;
+    console.log(xpathInput)
     let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    console.log(resultInput)
     let elementInput = resultInput.singleNodeValue;
+    console.log(elementInput)
     let codigo = elementInput.value;
     return codigo
 }
@@ -48,16 +51,10 @@ async function goItem(tab){
                     iconResult.innerHTML += '<br></br>'
                     iconResult.textContent += codigo;
                     iconResult.innerHTML += '<br></br>'
-                    console.log(prop)
-                    console.log(codigo)
+                    
 
                 } else {
-                    console.log('teste')
-                    console.log(`contador é: ${contador}`)
-                    console.log(filiado.email)
-                    console.log(filiado[prop])
-                    console.log(result)
-                    console.log(codigo)
+                    
                     
                 }
             } catch (error){
