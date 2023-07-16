@@ -4,6 +4,9 @@ let codigo = document.getElementById("codigo");
 let resultado = document.getElementById("result");
 let icon = document.getElementById("icon")
 
+
+let iconResult = document.getElementById("iconResult");
+
 let filiado = {
   matricula : '//*[@id="ContentPlaceHolder1_txbMatricula"]', 
   dataFiliacao : '//*[@id="ContentPlaceHolder1_txbDtInclusao"]',
@@ -31,12 +34,63 @@ const getInputs = (locations) => {
     return codigo
 }
 
-for (let prop in filiado) {
-  if (obj.hasOwnProperty(prop)) {
-    console.log(`Propriedade: ${prop}, Valor: ${obj[prop]}`);
-  }
+async function goItem(tab){
+    let contador = 0 ;
+    for (let prop in filiado) {
+        if (filiado.hasOwnProperty(prop)) {
+            try{
+                const result = await executeScriptAsync(tab.id, getInputs, [filiado[prop]]);
+                let codigo = result[0].result;
+                let retorno = `Propriedade: ${prop}, Valor: ${codigo}`;
+                contador += 1;
+                if(codigo !== ''){
+                    console.log(retorno);
+                    iconResult.innerHTML += '<br></br>'
+                    iconResult.textContent += codigo;
+                    iconResult.innerHTML += '<br></br>'
+                    console.log(prop)
+                    console.log(codigo)
+
+                } else {
+                    console.log('teste')
+                    console.log(`contador é: ${contador}`)
+                    console.log(filiado.email)
+                    console.log(filiado[prop])
+                    console.log(result)
+                    console.log(codigo)
+                    
+                }
+            } catch (error){
+                console.log(error);
+            }  
+
+        }
+
+      }
+      contador = 0;
 }
-let justice = filiado.matricula;
+
+ function executeScriptAsync(tabId, func, args){
+    return new Promise((resolve,reject) =>{
+
+        chrome.scripting.executeScript({target: {tabId}, function: func, args},
+            (result) => {
+                if (chrome.runtime.lastError){
+                    reject(chrome.runtime.lastError);
+                } else {
+                    resolve(result);
+                }
+            }
+            );
+    });
+ }
+
+
+
+
+
+
+
 
 icon.addEventListener('submit', async(event) => {
   event.preventDefault();  
@@ -49,15 +103,10 @@ icon.addEventListener('submit', async(event) => {
     context.drawImage(image, 0, 0);
     const imageData = context.getImageData(0, 0, 16, 16);
     chrome.action.setIcon({imageData}, () => {/*...*/});
-  }; 
-  chrome.scripting.executeScript({
-    target:{ tabId: tab.id},
-    function: getInputs,
-    args: [justice],
-        }, (result) => {
-            let codigo = result[0].result;
-            console.log(codigo);            
-        });
+  };
+
+  goItem(tab)
+
   image.src = '16_red.png';
 });
 
@@ -108,7 +157,6 @@ generateCode.addEventListener('submit', async(event) => {
         }, (result) => {
             if (!chrome.runtime.lastError && result && result[0] && result[0].result) {
                 var codigo = result[0].result;
-                
                 resultado.textContent = codigo;
                 generateCode.style.height = "180px";
                 console.log(codigo);
