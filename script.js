@@ -16,25 +16,24 @@ let filiado = {
   timeCoração : 'ddlTimeCoracaoFiliado',
   email: 'txbEmailFiliado',
   telefone: 'txbTelFiliado',
-  arquivos: 
-    {
+  // se a coluna 2 tiver a data igual ou superior a data de filiação, é true
+  };
+
+  /*
+    let scan = {
       tipoDocumento : `//*[@id="corpoPesquisa"]/tr[0]/td[2]`,
       arquivoOriginal : '//*[@id="dsArquivoOriginal"]',
       dataCriacao : '//*[@id="corpoPesquisa"]/tr[1]/td[3]',
-    }
-  // se a coluna 2 tiver a data igual ou superior a data de filiação, é true
-};
+    };
+  */
+
 const getInputs = (locations) => {
     let xpathInput = locations;
-    console.log(xpathInput)
     let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-    console.log(resultInput)
     let elementInput = resultInput.singleNodeValue;
-    console.log(elementInput)
     let codigo = elementInput.value;
     return codigo
 }
-
 async function goItem(tab){
     let contador = 0 ;
     for (let prop in filiado) {
@@ -46,25 +45,19 @@ async function goItem(tab){
                 contador += 1;
                 if(codigo !== ''){
                     console.log(retorno);
-                   
                     const newElement = document.createElement('div');
                     newElement.textContent = retorno;
-                    
                     iconResult.insertAdjacentElement('afterend', newElement);
-
-                } else {p
-                    
-                    
+                } else {
                 }
             } catch (error){
                 console.log(error);
             }  
-
         }
-
       }
       contador = 0;
 }
+
 
  function executeScriptAsync(tabId, func, args){
     return new Promise((resolve,reject) =>{
