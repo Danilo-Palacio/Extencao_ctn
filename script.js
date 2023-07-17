@@ -48,12 +48,13 @@ async function goItem(tab){
                 contador += 1;
                 if(codigo !== ''){
                     console.log(retorno);
-                    iconResult.innerHTML += '<br></br>'
-                    iconResult.textContent += codigo;
-                    iconResult.innerHTML += '<br></br>'
+                   
+                    const newElement = document.createElement('div');
+                    newElement.textContent = retorno;
                     
+                    iconResult.insertAdjacentElement('afterend', newElement);
 
-                } else {
+                } else {p
                     
                     
                 }
