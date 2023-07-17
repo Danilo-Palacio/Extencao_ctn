@@ -4,17 +4,18 @@ let codigo = document.getElementById("codigo");
 let resultado = document.getElementById("result");
 let icon = document.getElementById("icon")
 
+let xpath = `//*[@id="ContentPlaceHolder1_${filiado}"]`
 let filiado = {
-  matricula : '//*[@id="ContentPlaceHolder1_txbMatricula"]', 
-  dataFiliacao : '//*[@id="ContentPlaceHolder1_txbDtInclusao"]',
-  nomeCompleto : '//*[@id="ContentPlaceHolder1_txbNomeFiliado"]',
-  dataNascimento: '//*[@id="ContentPlaceHolder1_txbDtNascFiliado_txbData"]',
-  sexo : '//*[@id="ContentPlaceHolder1_ddlSexoFiliado"]',
-  estadoCivil : '//*[@id="ContentPlaceHolder1_ddlEstadoCivilFiliado"]',
-  identidade : '//*[@id="ContentPlaceHolder1_txbIdentFiliado"]',
-  timeCoração : '//*[@id="ContentPlaceHolder1_ddlTimeCoracaoFiliado"]',
-  email: '//*[@id="ContentPlaceHolder1_txbEmailFiliado"]',
-  telefone: '//*[@id="ContentPlaceHolder1_txbTelFiliado"]',
+  matricula : 'txbMatricula', 
+  dataFiliacao : 'txbDtInclusao',
+  nomeCompleto : 'txbNomeFiliado',
+  dataNascimento: 'txbDtNascFiliado_txbData',
+  sexo : 'ddlSexoFiliado',
+  estadoCivil : 'ddlEstadoCivilFiliado',
+  identidade : 'txbIdentFiliado',
+  timeCoração : 'ddlTimeCoracaoFiliado',
+  email: 'txbEmailFiliado',
+  telefone: 'txbTelFiliado',
   arquivos: 
     {
       tipoDocumento : `//*[@id="corpoPesquisa"]/tr[0]/td[2]`,
