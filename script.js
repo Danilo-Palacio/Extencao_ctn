@@ -1,4 +1,4 @@
-let generateCode = document.getElementById("generateCode")
+const generateCode = document.getElementById("generateCode");
 let matricula = document.getElementById("matricula");
 let codigo = document.getElementById("codigo");
 let resultado = document.getElementById("result");
@@ -7,18 +7,21 @@ let icon = document.getElementById("icon")
 
 let iconResult = document.getElementById("iconResult");
 
+
+
+
 let filiado = {
-  matricula : '//*[@id="ContentPlaceHolder1_txbMatricula"]', 
-  dataFiliacao : '//*[@id="ContentPlaceHolder1_txbDtInclusao"]',
-  nomeCompleto : '//*[@id="ContentPlaceHolder1_txbNomeFiliado"]',
-  dataNascimento: '//*[@id="ContentPlaceHolder1_txbDtNascFiliado_txbData"]',
-  sexo : '//*[@id="ContentPlaceHolder1_ddlSexoFiliado"]',
-  estadoCivil : '//*[@id="ContentPlaceHolder1_ddlEstadoCivilFiliado"]',
-  identidade : '//*[@id="ContentPlaceHolder1_txbIdentFiliado"]',
-  timeCoração : '//*[@id="ContentPlaceHolder1_ddlTimeCoracaoFiliado"]',
-  email: '//*[@id="ContentPlaceHolder1_txbEmailFiliado"]',
-  telefone: '//*[@id="ContentPlaceHolder1_txbTelFiliado"]',
-  arquivos: 
+  Matricula : 'txbMatricula', 
+  DataFiliacao : 'txbDtInclusao',
+  NomeCompleto : 'txbNomeFiliado',
+  DataNascimento: 'txbDtNascFiliado_txbData',
+  Sexo : 'ddlSexoFiliado',
+  EstadoCivil : 'ddlEstadoCivilFiliado',
+  Identidade : 'txbIdentFiliado',
+  TimeCoração : 'ddlTimeCoracaoFiliado',
+  Email: 'txbEmailFiliado',
+  Telefone: 'txbTelFiliado',
+  Arquivos: 
     {
       tipoDocumento : `//*[@id="corpoPesquisa"]/tr[0]/td[2]`,
       arquivoOriginal : '//*[@id="dsArquivoOriginal"]',
@@ -42,21 +45,23 @@ async function goItem(tab){
     for (let prop in filiado) {
         if (filiado.hasOwnProperty(prop)) {
             try{
-                const result = await executeScriptAsync(tab.id, getInputs, [filiado[prop]]);
+                const linkXpath = `//*[@id="ContentPlaceHolder1_${filiado[prop]}"]`
+                const result = await executeScriptAsync(tab.id, getInputs, [linkXpath]);
+               
                 let codigo = result[0].result;
                 let retorno = `Propriedade: ${prop}, Valor: ${codigo}`;
                 contador += 1;
-                if(codigo !== ''){
-                    console.log(retorno);
-                   
+                if(codigo !== ''){                   
                     const newElement = document.createElement('div');
                     newElement.textContent = retorno;
-                    
+                    newElement.style.color = 'green';
                     iconResult.insertAdjacentElement('afterend', newElement);
 
-                } else {p
-                    
-                    
+                } else {
+                    const newElement = document.createElement('div');
+                    newElement.textContent = retorno;
+                    newElement.style.color = 'red';
+                    iconResult.insertAdjacentElement('afterend', newElement);
                 }
             } catch (error){
                 console.log(error);
@@ -66,6 +71,32 @@ async function goItem(tab){
 
       }
       contador = 0;
+}
+
+export async function testGoItem(tab){
+    let contador = 0 ;
+    for (let prop in filiado) {
+        if (filiado.hasOwnProperty(prop)) {
+            try{
+                const linkXpath = `//*[@id="ContentPlaceHolder1_${filiado[prop]}"]`
+                const result = await executeScriptAsync(tab.id, getInputs, [linkXpath]);
+               
+                let codigo = result[0].result;
+                let retorno = `Propriedade: ${prop}, Valor: ${codigo}`;
+                contador += 1;
+                if(codigo === ''){                   
+                    contador += 1
+                }
+            } catch (error){
+                console.log(error);
+            }  
+
+        }
+let plural = contador > 1? as:a;
+
+      return {prop1: contador, prop2: plural}
+      }
+      
 }
 
  function executeScriptAsync(tabId, func, args){
@@ -85,7 +116,18 @@ async function goItem(tab){
 
 
 
-
+ function showStayHydratedNotification() {
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: '32_red.png',
+      title: 'Time to Hydrate',
+      message: 'Everyday I\'m Guzzlin\'!',
+      buttons: [
+        { title: 'Ignorar.'}
+      ],
+      priority: 0
+    });
+  }
 
 
 
@@ -104,28 +146,22 @@ icon.addEventListener('submit', async(event) => {
   };
 
   goItem(tab)
-
+  showStayHydratedNotification()
+  console.log("notificação")
   image.src = '16_red.png';
 });
 
-
-
-chrome.tabs.onActivated.addListener(activeInfo => {
-  chrome.tabs.get(activeInfo.tabId, tab => {
-    if (tab.url.includes('https://ctn.sistematodos.com.br/paginas/filiado/ListaFiliado.aspx')) {
-
-      console.log("ativo content")
-      // Injeta um script na guia ativa para detectar cliques nos botões
-      chrome.tabs.executeScript(tab.id, { file: 'contentScript.js' });
-      const element = document.querySelector('#ContentPlaceHolder1_btnPesquisar')
-   
-      element.addEventListener('submit', async(event) => {
-      event.preventDefault();  
-      alert('Botão clicado!')});
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === 'complete' && tab.url.includes('https://ctn.sistematodos.com.br/paginas/filiado/EditarFiliado.')) {
+      // Código a ser executado quando a guia é atualizada com a URL específica
+      alert(`Guia ${tabId} atualizada em ${tab.url}`);
+      ("ativo content")
+      showStayHydratedNotification()
+      // Outras ações desejadas...
     }
-  })
-});
-  
+  });
+
+
 let textoCopiado2 = "";
 
 const getCodigo = () =>{
