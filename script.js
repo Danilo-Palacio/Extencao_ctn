@@ -5,41 +5,36 @@ let resultado = document.getElementById("result");
 let icon = document.getElementById("icon")
 
 
-let iconResult = document.getElementById("iconResult");
-
-
-
 
 let filiado = {
-  Matricula : 'txbMatricula', 
-  DataFiliacao : 'txbDtInclusao',
-  NomeCompleto : 'txbNomeFiliado',
-  DataNascimento: 'txbDtNascFiliado_txbData',
-  Sexo : 'ddlSexoFiliado',
-  EstadoCivil : 'ddlEstadoCivilFiliado',
-  Identidade : 'txbIdentFiliado',
-  TimeCoração : 'ddlTimeCoracaoFiliado',
-  Email: 'txbEmailFiliado',
-  Telefone: 'txbTelFiliado',
-  Arquivos: 
-    {
+  matricula : 'txbMatricula', 
+  dataFiliacao : 'txbDtInclusao',
+  nomeCompleto : 'txbNomeFiliado',
+  dataNascimento: 'txbDtNascFiliado_txbData',
+  sexo : 'ddlSexoFiliado',
+  estadoCivil : 'ddlEstadoCivilFiliado',
+  identidade : 'txbIdentFiliado',
+  timeCoração : 'ddlTimeCoracaoFiliado',
+  email: 'txbEmailFiliado',
+  telefone: 'txbTelFiliado',
+  // se a coluna 2 tiver a data igual ou superior a data de filiação, é true
+  };
+
+  /*
+    let scan = {
       tipoDocumento : `//*[@id="corpoPesquisa"]/tr[0]/td[2]`,
       arquivoOriginal : '//*[@id="dsArquivoOriginal"]',
       dataCriacao : '//*[@id="corpoPesquisa"]/tr[1]/td[3]',
-    }
-  // se a coluna 2 tiver a data igual ou superior a data de filiação, é true
-};
+    };
+  */
+
 const getInputs = (locations) => {
     let xpathInput = locations;
-    console.log(xpathInput)
     let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-    console.log(resultInput)
     let elementInput = resultInput.singleNodeValue;
-    console.log(elementInput)
     let codigo = elementInput.value;
     return codigo
 }
-
 async function goItem(tab){
     let contador = 0 ;
     for (let prop in filiado) {
@@ -66,9 +61,7 @@ async function goItem(tab){
             } catch (error){
                 console.log(error);
             }  
-
         }
-
       }
       contador = 0;
 }
