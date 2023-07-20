@@ -1,6 +1,4 @@
 const generateCode = document.getElementById("generateCode");
-let matricula = document.getElementById("matricula");
-let codigo = document.getElementById("codigo");
 let resultado = document.getElementById("result");
 let icon = document.getElementById("icon")
 
@@ -42,7 +40,6 @@ async function goItem(tab){
             try{
                 const linkXpath = `//*[@id="ContentPlaceHolder1_${filiado[prop]}"]`
                 const result = await executeScriptAsync(tab.id, getInputs, [linkXpath]);
-               
                 let codigo = result[0].result;
                 let retorno = `Propriedade: ${prop}, Valor: ${codigo}`;
                 contador += 1;
@@ -66,31 +63,9 @@ async function goItem(tab){
       contador = 0;
 }
 
-export async function testGoItem(tab){
-    let contador = 0 ;
-    for (let prop in filiado) {
-        if (filiado.hasOwnProperty(prop)) {
-            try{
-                const linkXpath = `//*[@id="ContentPlaceHolder1_${filiado[prop]}"]`
-                const result = await executeScriptAsync(tab.id, getInputs, [linkXpath]);
-               
-                let codigo = result[0].result;
-                let retorno = `Propriedade: ${prop}, Valor: ${codigo}`;
-                contador += 1;
-                if(codigo === ''){                   
-                    contador += 1
-                }
-            } catch (error){
-                console.log(error);
-            }  
 
-        }
-let plural = contador > 1? as:a;
 
-      return {prop1: contador, prop2: plural}
-      }
-      
-}
+
 
  function executeScriptAsync(tabId, func, args){
     return new Promise((resolve,reject) =>{
@@ -122,9 +97,6 @@ let plural = contador > 1? as:a;
     });
   }
 
-
-
-
 icon.addEventListener('submit', async(event) => {
   event.preventDefault();  
   const [tab] = await chrome.tabs.query({ active: true, currentWindow:true });
@@ -154,23 +126,16 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
   });
 
-
-let textoCopiado2 = "";
-
 const getCodigo = () =>{
-
-  let xpathMatricula = '//*[@id="ContentPlaceHolder1_txbMatricula"]';
-  let resultMatricula = document.evaluate(xpathMatricula, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-  let elementMatricula = resultMatricula.singleNodeValue;
-
-  
-  let xpathCodigo = '//*[@id="ContentPlaceHolder1_gvContFiliados_lbCodigo_0"]';
-  let resultCodigo = document.evaluate(xpathCodigo, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-  let elementCodigo = resultCodigo.singleNodeValue ;
-  
-
-  let codigo =`${elementMatricula.value}_${elementCodigo.innerText}_`;
-  return codigo
+    const placeHolder = ['txbMatricula','gvContFiliados_lbCodigo_0']
+    const xpath = (placeHolder) =>{
+        const xpath = `//*[@id="ContentPlaceHolder1_${placeHolder}"]`;
+        const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+        const element = result.singleNodeValue;
+        return element
+    }
+    let codigo =`${xpath(placeHolder[0]).value}_${xpath(placeHolder[1]).innerText}_`;
+    return codigo
 }
 
 generateCode.addEventListener('submit', async(event) => {
@@ -183,7 +148,7 @@ generateCode.addEventListener('submit', async(event) => {
     function: getCodigo,
         }, (result) => {
             if (!chrome.runtime.lastError && result && result[0] && result[0].result) {
-                var codigo = result[0].result;
+                let codigo = result[0].result;
                 resultado.textContent = codigo;
                 generateCode.style.height = "180px";
                 console.log(codigo);
@@ -289,3 +254,26 @@ document.getElementById("baixarMigracao").addEventListener('click', function() {
   }
 
 
+export async function testGoItem(tab){
+    let contador = 0 ;
+    for (let prop in filiado) {
+        if (filiado.hasOwnProperty(prop)) {
+            try{
+                const linkXpath = `//*[@id="ContentPlaceHolder1_${filiado[prop]}"]`
+                const result = await executeScriptAsync(tab.id, getInputs, [linkXpath]);
+                let codigo = result[0].result;
+                let retorno = `Propriedade: ${prop}, Valor: ${codigo}`;
+                contador += 1;
+                if(codigo !== ''){                   
+                    contador += 1
+                }
+            } catch (error){
+                console.log(error);
+            }
+        }
+    let plural = contador > 1? as:a;
+
+    return {prop1: contador, prop2: plural}
+    }
+      
+}
