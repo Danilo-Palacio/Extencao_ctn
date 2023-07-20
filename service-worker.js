@@ -14,4 +14,3 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       chrome.notifications.create(notificationOptions);
     }
   });
-  
