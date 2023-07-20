@@ -120,7 +120,7 @@ document.getElementById("icon").addEventListener('submit', async(event) => {
 
   goItem(tab)
   console.log("notificação")
-  image.src = '16_red.png';
+  image.src = 'images/16_red.png';
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {

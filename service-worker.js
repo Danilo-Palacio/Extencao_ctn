@@ -1,5 +1,6 @@
-import {getAffiliateInfo } from './script.js';
 
+import './script.js';
+import {getAffiliateInfo } from './script.js';
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete' && tab.url.includes('https://ctn.sistematodos.com.br/paginas/filiado/EditarFiliado.'))  {
