@@ -1,10 +1,5 @@
-const generateCode = document.getElementById("generateCode");
-let resultado = document.getElementById("result");
-let icon = document.getElementById("icon")
 
-
-
-let filiado = {
+const filiado = {
   matricula : 'txbMatricula', 
   dataFiliacao : 'txbDtInclusao',
   nomeCompleto : 'txbNomeFiliado',
@@ -33,6 +28,38 @@ const getInputs = (locations) => {
     let codigo = elementInput.value;
     return codigo
 }
+async function getAffiliateInfo(tab){
+    let contador = 0 ;
+
+    let xpathInput = locations;
+    let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    let elementInput = resultInput.singleNodeValue;
+    let codeInput = elementInput.value;
+
+    for (let prop in filiado) {
+
+        if (filiado.hasOwnProperty(prop)) {
+            try{
+                const linkXpath = `//*[@id="ContentPlaceHolder1_${filiado[prop]}"]`
+                const result = await executeScriptAsync(tab.id, codeInput, linkXpath);
+                let codigo = result[0].result;
+                let retorno = `Propriedade: ${prop}, Valor: ${codigo}`;
+                contador += 1;
+                if(codigo !== ''){                   
+                    contador += 1
+                }
+            } catch (error){
+                console.log(error);
+            }
+        }
+    let plural = contador > 1? as:a;
+
+    return {prop1: contador, prop2: plural}
+    }
+    return {prop1: contador, prop2: plural}
+};
+export{getAffiliateInfo};
+
 async function goItem(tab){
     let contador = 0 ;
     for (let prop in filiado) {
@@ -63,11 +90,7 @@ async function goItem(tab){
       contador = 0;
 }
 
-
-
-
-
- function executeScriptAsync(tabId, func, args){
+function executeScriptAsync(tabId, func, args){
     return new Promise((resolve,reject) =>{
 
         chrome.scripting.executeScript({target: {tabId}, function: func, args},
@@ -80,9 +103,9 @@ async function goItem(tab){
             }
             );
     });
- }
+}
 
-icon.addEventListener('submit', async(event) => {
+document.getElementById("icon").addEventListener('submit', async(event) => {
   event.preventDefault();  
   const [tab] = await chrome.tabs.query({ active: true, currentWindow:true });
   const canvas = new OffscreenCanvas(16, 16);
@@ -108,7 +131,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       showStayHydratedNotification()
       // Outras ações desejadas...
     }
-  });
+});
 
 const getCodigo = () =>{
     const placeHolder = ['txbMatricula','gvContFiliados_lbCodigo_0']
@@ -122,6 +145,8 @@ const getCodigo = () =>{
     return codigo
 }
 
+let generateCode = document.getElementById("generateCode");
+
 generateCode.addEventListener('submit', async(event) => {
   event.preventDefault();  
 
@@ -133,7 +158,7 @@ generateCode.addEventListener('submit', async(event) => {
         }, (result) => {
             if (!chrome.runtime.lastError && result && result[0] && result[0].result) {
                 let codigo = result[0].result;
-                resultado.textContent = codigo;
+                document.getElementById("resultCode").textContent = codigo;
                 generateCode.style.height = "180px";
                 console.log(codigo);
                 navigator.clipboard.writeText(codigo)
@@ -204,60 +229,37 @@ document.getElementById("baixarMigracao").addEventListener('click', function() {
   
 });
 
-  function alterarFormatoData(data) {
-    var valor = data;
-      if (valor) {
-      var data = new Date(valor);
-      var dia = data.getDate() + 1;
-      var mes = data.getMonth() + 1; // Adiciona +1, pois os meses em JavaScript são baseados em zero (janeiro é 0)
-      var ano = data.getFullYear();
-      if (mes < 10) {
-        mes = "0" + mes;
-      }
-      if (dia < 10){
-        dia = "0" + dia;
-      }
-        var dataFormatada = dia + "/" + mes + "/" + ano;
-      return dataFormatada
+function alterarFormatoData(data) {
+var valor = data;
+    if (valor) {
+    var data = new Date(valor);
+    var dia = data.getDate() + 1;
+    var mes = data.getMonth() + 1; // Adiciona +1, pois os meses em JavaScript são baseados em zero (janeiro é 0)
+    var ano = data.getFullYear();
+    if (mes < 10) {
+    mes = "0" + mes;
     }
-  }
-  
-
-  function alterarFormatoMigracao(data){
-    var valor = data;
-    if (valor){
-      var data = new Date(valor);
-      var mes = data.getMonth() + 2;
-      var ano = data.getFullYear();
-      if (mes < 10) {
-        mes = "0" + mes ;
-      }
-      let dataFormatada = ano +"/"+ mes;
-      return dataFormatada
+    if (dia < 10){
+    dia = "0" + dia;
     }
-  }
-
-
-export async function testGoItem(tab){
-    let contador = 0 ;
-    for (let prop in filiado) {
-        if (filiado.hasOwnProperty(prop)) {
-            try{
-                const linkXpath = `//*[@id="ContentPlaceHolder1_${filiado[prop]}"]`
-                const result = await executeScriptAsync(tab.id, getInputs, [linkXpath]);
-                let codigo = result[0].result;
-                let retorno = `Propriedade: ${prop}, Valor: ${codigo}`;
-                contador += 1;
-                if(codigo !== ''){                   
-                    contador += 1
-                }
-            } catch (error){
-                console.log(error);
-            }
-        }
-    let plural = contador > 1? as:a;
-
-    return {prop1: contador, prop2: plural}
-    }
-      
+    var dataFormatada = dia + "/" + mes + "/" + ano;
+    return dataFormatada
 }
+}
+
+
+function alterarFormatoMigracao(data){
+var valor = data;
+if (valor){
+    var data = new Date(valor);
+    var mes = data.getMonth() + 2;
+    var ano = data.getFullYear();
+    if (mes < 10) {
+    mes = "0" + mes ;
+    }
+    let dataFormatada = ano +"/"+ mes;
+    return dataFormatada
+}
+}
+
+
