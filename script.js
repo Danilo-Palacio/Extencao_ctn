@@ -82,21 +82,6 @@ async function goItem(tab){
     });
  }
 
-
-
- function showStayHydratedNotification() {
-    chrome.notifications.create({
-      type: 'basic',
-      iconUrl: '32_red.png',
-      title: 'Time to Hydrate',
-      message: 'Everyday I\'m Guzzlin\'!',
-      buttons: [
-        { title: 'Ignorar.'}
-      ],
-      priority: 0
-    });
-  }
-
 icon.addEventListener('submit', async(event) => {
   event.preventDefault();  
   const [tab] = await chrome.tabs.query({ active: true, currentWindow:true });
@@ -111,7 +96,6 @@ icon.addEventListener('submit', async(event) => {
   };
 
   goItem(tab)
-  showStayHydratedNotification()
   console.log("notificação")
   image.src = '16_red.png';
 });
