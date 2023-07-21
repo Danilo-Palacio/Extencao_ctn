@@ -1,4 +1,8 @@
+import { getAffiliateInfo } from './getAffiliateInfo.js';
+
 // Ouvinte para mensagens enviadas pela página de conteúdo
+/*
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'tabUpdated') {        
         chrome.tabs.onUpdated.addListener(async(tabId, changeInfo, tab) => {
@@ -18,3 +22,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       console.log(`Página atualizada: ${message.url}`);
     }
   });
+*/
+
+
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'tabUpdated') {
+    chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+      if (changeInfo.status === 'complete' && tab.url.includes('https://ctn.sistematodos.com.br/paginas/filiado/EditarFiliado.')) {
+        const mensagem = await getAffiliateInfo(tab);
+        if (mensagem && mensagem.prop1 && mensagem.prop2) {
+          const notificationOptions = {
+            type: 'basic',
+            iconUrl: './images/icon128.png',
+            title: 'Análise do Filiado',
+            message: `Encontramos ${mensagem.prop1} problem${mensagem.prop2} no contrato.`
+          };
+          chrome.notifications.create(notificationOptions);
+        }
+      }
+    });
+    console.log(`Página atualizada: ${message.url}`);
+  }
+});

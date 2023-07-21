@@ -1,3 +1,7 @@
+import { getCodigo } from './funcaoGerarCodigo.js';
+
+
+
 const icon = document.querySelector("#icon");
 const generateCode = document.getElementById("generateCode");
 const spaceCodeGenetator = document.getElementById("spaceCodeGenetator");
@@ -16,64 +20,13 @@ const filiado = {
   // se a coluna 2 tiver a data igual ou superior a data de filiação, é true
   };
 
-  /*
-    let scan = {
-      tipoDocumento : `//*[@id="corpoPesquisa"]/tr[0]/td[2]`,
-      arquivoOriginal : '//*[@id="dsArquivoOriginal"]',
-      dataCriacao : '//*[@id="corpoPesquisa"]/tr[1]/td[3]',
-    };
-  */
-
-const codeInputs = (locations) => {
+  const codeInputs = (locations) => {
     let xpathInput = locations;
     let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
     let elementInput = resultInput.singleNodeValue;
     let codigo = elementInput.value;
     return codigo
 }
-async function getAffiliateInfo(tab){
-    let contador = 0 ;
-
-    for (let prop in filiado) {
-        if (filiado.hasOwnProperty(prop)) {
-            try{
-                const linkXpath = `//*[@id="ContentPlaceHolder1_${filiado[prop]}"]`;
-                const result = await executeScriptAsync(tab.id, codeInputs, linkXpath);
-                let codigo = result[0].result;
-                let retorno = `Propriedade: ${prop}, Valor: ${codigo}`;
-                contador += 1;
-                if(codigo !== ''){                   
-                    contador += 1;
-                }
-            } catch (error){
-                console.log(error);
-            }
-        }
-    }
-
-    let plural = contador > 1 ? 'as' : 'a';
-
-    return {prop1: contador, prop2: plural}
-};
-
-/*
-chrome.tabs.onUpdated.addListener(async(tabId, changeInfo, tab) => {
-    if (changeInfo.status === 'complete' && tab.url.includes('https://ctn.sistematodos.com.br/paginas/filiado/EditarFiliado.'))  {
-      const notificationOptions = {
-        type: 'basic',
-        iconUrl: './images/icon128.png',
-        title: 'Analise do Filiado',
-        message: `Encontramos ${getAffiliateInfo.prop1} problem${getAffiliateInfo.prop2} no contrato.`
-      };
-  
-      chrome.notifications.create(notificationOptions);
-    }
-  });
-
-
-*/
-
-
 
 async function mostrarItens(tab){
     let contador = 0 ;
@@ -139,63 +92,33 @@ icon.addEventListener('submit', async(event) => {
 
 
 
-window.addEventListener('load', () => {
-  const mensagem = {
-    tipo: 'minha_mensagem',
-    dados: {
-      informacoes: 'informacoes importantes',
-      getAffiliateInfo: (retorno) => {
-        console.log('Função de retorno executada:', retorno);
-        // Faça algo com o retorno da função
-      }
-    }
-  };
-  // Envie uma mensagem para o background script para informar sobre a atualização da guia
-  chrome.runtime.sendMessage({ type: 'tabUpdated', url: window.location.href , mensagem});
-});
-
-
-
-
-
-
-
-
 //Função de Gerar Codigo
-function getCodigo(){
-    const placeHolder = ['txbMatricula','gvContFiliados_lbCodigo_0']
-    const xpath = (placeHolder) => {
-        const xpath = `//*[@id="ContentPlaceHolder1_${placeHolder}"]`;
-        const xpathResult = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-        const element = xpathResult && xpathResult.singleNodeValue;
-        return element
-    }
-    let codigo =`${xpath(placeHolder[0]).value}_${xpath(placeHolder[1]).textContent}_`;
-    return codigo
-}
 generateCode.addEventListener('submit', async(event) => {
   event.preventDefault();  
   const [tab] = await chrome.tabs.query({ active: true, currentWindow:true });
- 
   chrome.scripting.executeScript({
-    
       target:{ tabId: tab.id},
       function: getCodigo,
-      },(result) => {
-          if (!chrome.runtime.lastError && result && result[0] && result[0].result) {
+      },(result) => {   
               let codigo = result[0].result;
               spaceCodeGenetator.textContent = codigo;
               generateCode.style.height = "180px";
               console.log(codigo);
               navigator.clipboard.writeText(codigo)
-          }
   });
-  
 });
-//Fim da Função de Gerar Codigo
 
 
-
+window.addEventListener('load', () => {
+  const mensagem = {
+    tipo: 'minha_mensagem',
+    dados: {
+      informacoes: 'informacoes importantes',
+    }
+  };
+  // Envie uma mensagem para o background script para informar sobre a atualização da guia
+  chrome.runtime.sendMessage({ type: 'tabUpdated', url: window.location.href, mensagem });
+});
 
 
 
@@ -235,57 +158,55 @@ if (classDisplay.style.display === 'none'|| classDisplay.style.display === ''){
 }
 });
 //Fim do modal
-
+let type;
 
 //Baixar Relatório Filiado
 document.getElementById("baixarFiliacao").addEventListener('click', function() {
-  let start= document.getElementById("start");
-  let end = document.getElementById("end");
-  let startFormatado = alterarFormatoData(start.value)
-  let endFormatado = alterarFormatoData(end.value)
+  const start= document.getElementById("start");
+  const end = document.getElementById("end");
+  type = "baixarFiliacao";
+  const startFormatado = alterarFormatoData(start.value, type)
+  const endFormatado = alterarFormatoData(end.value, type)
 
-  let linkFiliacao = `https://ctn.sistematodos.com.br/paginas/filiado/relatorio/FiliacaoPorVendedor.aspx?dataInicio=${startFormatado}&dataFim=${endFormatado}`;
+  const linkFiliacao = `https://ctn.sistematodos.com.br/paginas/filiado/relatorio/FiliacaoPorVendedor.aspx?dataInicio=${startFormatado}&dataFim=${endFormatado}`;
   chrome.tabs.create({ url: linkFiliacao});
 });
 
 //Baixar Relatório Migração
 document.getElementById("baixarMigracao").addEventListener('click', function() {
-  let referenciaMigracao = document.getElementById("referencia");
-  let referenciaMigracaoFormatado = alterarFormatoMigracao(referenciaMigracao.value)
+  const referenciaMigracao = document.getElementById("referencia");
+  type = "baixarMigracao";
+  const referenciaMigracaoFormatado = alterarFormatoData(referenciaMigracao.value, type)
   
   let linkMigracao = `https://ctn.sistematodos.com.br/paginas/filiado/relatorio/RelatorioFiliadosMigrados.aspx?referencia=${referenciaMigracaoFormatado}`
-  chrome.tabs.create({ url: linkMigracao });
-  
+  //chrome.tabs.create({ url: linkMigracao });
+  alert(linkMigracao)
 });
-function alterarFormatoData(data) {
-var valor = data;
-    if (valor) {
-    var data = new Date(valor);
-    var dia = data.getDate() + 1;
-    var mes = data.getMonth() + 1; // Adiciona +1, pois os meses em JavaScript são baseados em zero (janeiro é 0)
-    var ano = data.getFullYear();
-    if (mes < 10) {
-    mes = "0" + mes;
-    }
-    if (dia < 10){
-    dia = "0" + dia;
-    }
-    var dataFormatada = dia + "/" + mes + "/" + ano;
-    return dataFormatada
-}
-}
-function alterarFormatoMigracao(data){
-var valor = data;
-if (valor){
-    var data = new Date(valor);
-    var mes = data.getMonth() + 2;
-    var ano = data.getFullYear();
-    if (mes < 10) {
-    mes = "0" + mes ;
-    }
-    let dataFormatada = ano +"/"+ mes;
-    return dataFormatada
-}
-}
 
 
+function alterarFormatoData(data, type) {
+  const valor = data;
+      if (valor) {
+        let data = new Date(valor);
+        let mes = data.getMonth() + 1; // Adiciona +1, pois os meses em JavaScript são baseados em zero (janeiro é 0)
+        let ano = data.getFullYear();
+        let dia = data.getDate() + 1;
+
+            if (mes < 10) {
+              mes = "0" + mes;
+            }
+            if (dia < 10){
+              dia = "0" + dia;
+            }
+            if( type === "baixarFiliado"){
+              let dataFormatada = dia + "/" + mes + "/" + ano;
+              return dataFormatada
+            }else{
+              let dataFormatada = ano +"/"+ mes;
+              return dataFormatada
+            }
+            
+
+
+      }
+}
