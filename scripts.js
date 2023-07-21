@@ -1,4 +1,4 @@
-const icon = document.getElementById("icon");
+const icon = document.querySelector("#icon");
 const generateCode = document.getElementById("generateCode");
 const spaceCodeGenetator = document.getElementById("spaceCodeGenetator");
 
@@ -140,8 +140,18 @@ icon.addEventListener('submit', async(event) => {
 
 
 window.addEventListener('load', () => {
+  const mensagem = {
+    tipo: 'minha_mensagem',
+    dados: {
+      informacoes: 'informacoes importantes',
+      getAffiliateInfo: (retorno) => {
+        console.log('Função de retorno executada:', retorno);
+        // Faça algo com o retorno da função
+      }
+    }
+  };
   // Envie uma mensagem para o background script para informar sobre a atualização da guia
-  chrome.runtime.sendMessage({ type: 'tabUpdated', url: window.location.href });
+  chrome.runtime.sendMessage({ type: 'tabUpdated', url: window.location.href , mensagem});
 });
 
 
