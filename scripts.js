@@ -1,3 +1,6 @@
+const icon = document.getElementById("icon");
+const generateCode = document.getElementById("generateCode");
+const spaceCodeGenetator = document.getElementById("spaceCodeGenetator");
 
 const filiado = {
   matricula : 'txbMatricula', 
@@ -21,7 +24,7 @@ const filiado = {
     };
   */
 
-const getInputs = (locations) => {
+const codeInputs = (locations) => {
     let xpathInput = locations;
     let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
     let elementInput = resultInput.singleNodeValue;
@@ -31,42 +34,54 @@ const getInputs = (locations) => {
 async function getAffiliateInfo(tab){
     let contador = 0 ;
 
-    let xpathInput = locations;
-    let resultInput = document.evaluate(xpathInput, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-    let elementInput = resultInput.singleNodeValue;
-    let codeInput = elementInput.value;
-
     for (let prop in filiado) {
-
         if (filiado.hasOwnProperty(prop)) {
             try{
-                const linkXpath = `//*[@id="ContentPlaceHolder1_${filiado[prop]}"]`
-                const result = await executeScriptAsync(tab.id, codeInput, linkXpath);
+                const linkXpath = `//*[@id="ContentPlaceHolder1_${filiado[prop]}"]`;
+                const result = await executeScriptAsync(tab.id, codeInputs, linkXpath);
                 let codigo = result[0].result;
                 let retorno = `Propriedade: ${prop}, Valor: ${codigo}`;
                 contador += 1;
                 if(codigo !== ''){                   
-                    contador += 1
+                    contador += 1;
                 }
             } catch (error){
                 console.log(error);
             }
         }
-    let plural = contador > 1? as:a;
-
-    return {prop1: contador, prop2: plural}
     }
+
+    let plural = contador > 1 ? 'as' : 'a';
+
     return {prop1: contador, prop2: plural}
 };
-export{getAffiliateInfo};
 
-async function goItem(tab){
+/*
+chrome.tabs.onUpdated.addListener(async(tabId, changeInfo, tab) => {
+    if (changeInfo.status === 'complete' && tab.url.includes('https://ctn.sistematodos.com.br/paginas/filiado/EditarFiliado.'))  {
+      const notificationOptions = {
+        type: 'basic',
+        iconUrl: './images/icon128.png',
+        title: 'Analise do Filiado',
+        message: `Encontramos ${getAffiliateInfo.prop1} problem${getAffiliateInfo.prop2} no contrato.`
+      };
+  
+      chrome.notifications.create(notificationOptions);
+    }
+  });
+
+
+*/
+
+
+
+async function mostrarItens(tab){
     let contador = 0 ;
     for (let prop in filiado) {
         if (filiado.hasOwnProperty(prop)) {
             try{
                 const linkXpath = `//*[@id="ContentPlaceHolder1_${filiado[prop]}"]`
-                const result = await executeScriptAsync(tab.id, getInputs, [linkXpath]);
+                const result = await executeScriptAsync(tab.id, codeInputs, [linkXpath]);
                 let codigo = result[0].result;
                 let retorno = `Propriedade: ${prop}, Valor: ${codigo}`;
                 contador += 1;
@@ -89,7 +104,6 @@ async function goItem(tab){
       }
       contador = 0;
 }
-
 function executeScriptAsync(tabId, func, args){
     return new Promise((resolve,reject) =>{
 
@@ -104,67 +118,74 @@ function executeScriptAsync(tabId, func, args){
             );
     });
 }
+icon.addEventListener('submit', async(event) => {
+    event.preventDefault();  
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow:true });
+    const canvas = new OffscreenCanvas(16, 16);
+    const context = canvas.getContext('2d');
+    const image = new Image();
 
-document.getElementById("icon").addEventListener('submit', async(event) => {
-  event.preventDefault();  
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow:true });
-  const canvas = new OffscreenCanvas(16, 16);
-  const context = canvas.getContext('2d');
-  const image = new Image();
+    image.onload = () => {
+      context.drawImage(image, 0, 0);
+      const imageData = context.getImageData(0, 0, 16, 16);
+      chrome.action.setIcon({imageData}, () => {/*...*/});
+    };
 
-  image.onload = () => {
-    context.drawImage(image, 0, 0);
-    const imageData = context.getImageData(0, 0, 16, 16);
-    chrome.action.setIcon({imageData}, () => {/*...*/});
-  };
-
-  goItem(tab)
-  console.log("notificação")
-  image.src = 'images/16_red.png';
+    mostrarItens(tab)
+    console.log("clicou no icon e vai mostrar os itens")
+    image.src = 'images/16_red.png';
 });
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status === 'complete' && tab.url.includes('https://ctn.sistematodos.com.br/paginas/filiado/EditarFiliado.')) {
-      // Código a ser executado quando a guia é atualizada com a URL específica
-      alert(`Guia ${tabId} atualizada em ${tab.url}`);
-      ("ativo content")
-      showStayHydratedNotification()
-      // Outras ações desejadas...
-    }
+
+
+
+window.addEventListener('load', () => {
+  // Envie uma mensagem para o background script para informar sobre a atualização da guia
+  chrome.runtime.sendMessage({ type: 'tabUpdated', url: window.location.href });
 });
 
-const getCodigo = () =>{
+
+
+
+
+
+
+
+//Função de Gerar Codigo
+function getCodigo(){
     const placeHolder = ['txbMatricula','gvContFiliados_lbCodigo_0']
-    const xpath = (placeHolder) =>{
+    const xpath = (placeHolder) => {
         const xpath = `//*[@id="ContentPlaceHolder1_${placeHolder}"]`;
-        const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-        const element = result.singleNodeValue;
+        const xpathResult = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+        const element = xpathResult && xpathResult.singleNodeValue;
         return element
     }
-    let codigo =`${xpath(placeHolder[0]).value}_${xpath(placeHolder[1]).innerText}_`;
+    let codigo =`${xpath(placeHolder[0]).value}_${xpath(placeHolder[1]).textContent}_`;
     return codigo
 }
-
-let generateCode = document.getElementById("generateCode");
-
 generateCode.addEventListener('submit', async(event) => {
   event.preventDefault();  
-
   const [tab] = await chrome.tabs.query({ active: true, currentWindow:true });
-
+ 
   chrome.scripting.executeScript({
-    target:{ tabId: tab.id},
-    function: getCodigo,
-        }, (result) => {
-            if (!chrome.runtime.lastError && result && result[0] && result[0].result) {
-                let codigo = result[0].result;
-                document.getElementById("resultCode").textContent = codigo;
-                generateCode.style.height = "180px";
-                console.log(codigo);
-                navigator.clipboard.writeText(codigo)
-            }
+    
+      target:{ tabId: tab.id},
+      function: getCodigo,
+      },(result) => {
+          if (!chrome.runtime.lastError && result && result[0] && result[0].result) {
+              let codigo = result[0].result;
+              spaceCodeGenetator.textContent = codigo;
+              generateCode.style.height = "180px";
+              console.log(codigo);
+              navigator.clipboard.writeText(codigo)
+          }
   });
+  
 });
+//Fim da Função de Gerar Codigo
+
+
+
 
 
 
@@ -203,9 +224,7 @@ if (classDisplay.style.display === 'none'|| classDisplay.style.display === ''){
   idReport.style.height = "100%";
 }
 });
-
 //Fim do modal
-
 
 
 //Baixar Relatório Filiado
@@ -228,7 +247,6 @@ document.getElementById("baixarMigracao").addEventListener('click', function() {
   chrome.tabs.create({ url: linkMigracao });
   
 });
-
 function alterarFormatoData(data) {
 var valor = data;
     if (valor) {
@@ -246,8 +264,6 @@ var valor = data;
     return dataFormatada
 }
 }
-
-
 function alterarFormatoMigracao(data){
 var valor = data;
 if (valor){

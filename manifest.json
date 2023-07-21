@@ -10,16 +10,26 @@
 
     "permissions": [
         "notifications",
+        "activeTab",
         "scripting",
         "tabs",
         "storage"
     ],
+    "content_scripts": [
+        {
+          "matches": ["https://ctn.sistematodos.com.br/paginas/filiado/*"], 
+          "js": ["scripts.js"], 
+          "run_at": "document_idle" 
+        }
+      ],
     "background": {
-        "service_worker": "service-worker.js",
+        "service_worker": "background.js",
         "type": "module"
       },
     "action": {
         "default_popup": "index.html",
+        "default_action": "popup.js", 
+ 
         "default_icon": {
             "16": "images/icon16.png",
             "32": "images/icon32.png",
