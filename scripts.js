@@ -158,11 +158,13 @@ if (classDisplay.style.display === 'none'|| classDisplay.style.display === ''){
 }
 });
 //Fim do modal
+
 let type;
 
 //Baixar Relatório Filiado
-document.getElementById("baixarFiliacao").addEventListener('click', function() {
-  const start= document.getElementById("start");
+document.querySelector("#baixarFiliacao").addEventListener('submit', async(event) => {
+  event.preventDefault();
+  const start = document.getElementById("start");
   const end = document.getElementById("end");
   type = "baixarFiliacao";
   const startFormatado = alterarFormatoData(start.value, type)
@@ -173,14 +175,17 @@ document.getElementById("baixarFiliacao").addEventListener('click', function() {
 });
 
 //Baixar Relatório Migração
-document.getElementById("baixarMigracao").addEventListener('click', function() {
+document.querySelector("#baixarMigracao").addEventListener('submit', async(event) => {
+  event.preventDefault();
   const referenciaMigracao = document.getElementById("referencia");
   type = "baixarMigracao";
   const referenciaMigracaoFormatado = alterarFormatoData(referenciaMigracao.value, type)
   
   let linkMigracao = `https://ctn.sistematodos.com.br/paginas/filiado/relatorio/RelatorioFiliadosMigrados.aspx?referencia=${referenciaMigracaoFormatado}`
   //chrome.tabs.create({ url: linkMigracao });
-  alert(linkMigracao)
+  console.log(linkMigracao)
+  console.log(referenciaMigracaoFormatado)
+  console.log(referenciaMigracao)
 });
 
 
